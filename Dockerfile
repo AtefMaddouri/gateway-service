@@ -1,5 +1,5 @@
 # Use an OpenJDK Runtime as a parent image
-FROM openjdk:8-jre-alpine
+FROM openjdk:11-jre-alpine
 # Add Maintainer Info
 LABEL maintainer="atef.maddouri@esprit.tn"
 # Define environment variables
