@@ -1,0 +1,50 @@
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: acratef.azurecr.io
+        username: ${{ secrets.acr_acratef_username }}
+        password: ${{ secrets.acr_acratef_password }}
+    
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        docker build "$GITHUB_WORKSPACE/" -f  "Dockerfile" -t acratef.azurecr.io/aksesprit:${{ github.sha }} --label dockerfile-path=Dockerfile
+        docker push acratef.azurecr.io/aksesprit:${{ github.sha }}
+    
+    - uses: azure/k8s-set-context@v1
+      with:
+         kubeconfig: ${{ secrets.aks_aksesprit_kubeConfig }}
+      id: login
+    
+    - name: Create namespace
+      run: |
+        namespacePresent=`kubectl get namespace | grep aks-esprit-gateway | wc -l`
+        if [ $namespacePresent -eq 0 ]
+        then
+            echo `kubectl create namespace aks-esprit-gateway`
+        fi
+
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: aks-esprit-gateway
+        container-registry-url: acratef.azurecr.io
+        container-registry-username: ${{ secrets.acr_acratef_username }}
+        container-registry-password: ${{ secrets.acr_acratef_password }}
+        secret-name: aksespritdockerauth
+       
+    - uses: azure/k8s-deploy@v1.2
+      with:
+        namespace: aks-esprit-gateway
+        manifests: |
+          manifests/deployment.yml
+          manifests/service.yml
+        images: |
+          acratef.azurecr.io/aksesprit:${{ github.sha }}
+        imagepullsecrets: |
+          aksespritdockerauth
