@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "aksesprit-b018"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "aksesprit-b018"
+  template:
+    metadata:
+      labels:
+        app: "aksesprit-b018"
+    spec:
+      containers:
+        - name: "aksesprit-b018"
+          image: "acratef.azurecr.io/aksesprit"
+          ports:
+          - containerPort: 9090
