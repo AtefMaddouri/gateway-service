@@ -29,7 +29,8 @@ pipeline {
             steps {
                 sh "docker stop gateway-service || true"
                 sh "docker rm image gateway-service || true"
-                sh "docker run --name gateway-service --link config-service --link discovery-service -d -p 9090:9090 --restart always atef/gateway-service:1.0"
+                sh "docker run --name gateway-service --network=atefazure_default -d -p 9090:9090 --restart always atef/gateway-service:1.0"
+                // sh "docker run --name gateway-service --link config-service --link discovery-service -d -p 9090:9090 --restart always atef/gateway-service:1.0"
             }
         }
     }
