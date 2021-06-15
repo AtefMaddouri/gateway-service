@@ -22,7 +22,7 @@ class PreFlightCorsConfiguration {
         CorsConfiguration config = new CorsConfiguration().
                 applyPermitDefaultValues();
         config.addAllowedMethod("DELETE");
-        config.addAllowedOriginPattern("http://localhost:4200");
+        config.addAllowedOriginPattern("http://102.37.117.187:1000/");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
